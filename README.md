@@ -1,4 +1,4 @@
-# Enterprise Endpoint Management System
+# Endpoint Management System
 
 A full-stack web-based system for managing organizational departments, sub-departments, agencies, and endpoint devices through a hierarchical structure.
 
