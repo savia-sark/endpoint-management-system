@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Endpoint Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- LOGIN PAGE -->
+    <div id="login-page" class="login-page">
+        <div class="login-card">
+            <h2>Endpoint Management System</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" autocomplete="username" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" autocomplete="current-password" required>
+                </div>
+                <button class="btn btn-primary" type="submit">
+                    Login
+                </button>
+                <p id="login-error" class="field-error"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container" class="hidden">
+        <!-- Top Navigation Bar -->
+        <header class="top-nav">
+            <div class="nav-brand">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <h1>Endpoint Management System</h1>
+            </div>
+            <div class="nav-actions">
+                <div class="search-global-container">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="global-search" placeholder="Search Endpoint ID..."
+                        aria-label="Global Search">
+                </div>
+                <button id="btn-refresh" class="btn btn-secondary" title="Refresh Data">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        class="icon-spin-target">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+                <!-- Logout Button -->
+                <button id="btn-logout" class="btn btn-secondary">
+                    Logout
+                </button>
+            </div>
+        </header>
+
+        <div class="app-layout">
+            <!-- Left Sidebar Navigation -->
+            <aside class="sidebar">
+                <nav class="sidebar-menu">
+                    <button class="nav-item" data-target="dashboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="7" height="9"></rect>
+                            <rect x="14" y="3" width="7" height="5"></rect>
+                            <rect x="14" y="12" width="7" height="9"></rect>
+                            <rect x="3" y="16" width="7" height="5"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                        <span class="badge badge-neutral">Draft</span>
+                    </button>
+                    <button class="nav-item active" data-target="endpoints">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="2" width="20" height="8" rx="2.18" ry="2.18"></rect>
+                            <rect x="2" y="14" width="20" height="8" rx="2.18" ry="2.18"></rect>
+                            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                        <span>Endpoints</span>
+                    </button>
+                    <button class="nav-item" data-target="agency-types">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Agency Types</span>
+                    </button>
+                    <button class="nav-item" data-target="agencies">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Agencies</span>
+                    </button>
+                </nav>
+                <div class="sidebar-footer">
+                    <p>System Version: 1.4.2</p>
+                    <p>Role: Enterprise Admin</p>
+                </div>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <!-- Loading overlay inside content area -->
+                <div id="content-loader" class="loader-overlay hidden">
+                    <div class="spinner"></div>
+                    <span>Loading system state...</span>
+                </div>
+
+                <!-- Page: Dashboard -->
+                <section id="page-dashboard" class="content-page hidden">
+                    <div class="page-header">
+                        <div>
+                            <h2>Dashboard</h2>
+                            <p class="page-subtitle">Review endpoint health and distribution across the organization.</p>
+                        </div>
+                    </div>
+                    <div class="dashboard-grid">
+                        <div class="stat-card card">
+                            <div class="stat-card-title">Serviceable Endpoints</div>
+                            <div class="stat-card-value" id="dashboard-serviceable-count">0</div>
+                        </div>
+                        <div class="stat-card card">
+                            <div class="stat-card-title">Unserviceable Endpoints</div>
+                            <div class="stat-card-value" id="dashboard-unserviceable-count">0</div>
+                        </div>
+                        <div class="stat-card card card-full">
+                            <div class="stat-card-title">Endpoints by Type</div>
+                            <div class="dashboard-table-wrapper">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr><th>Type</th><th>Count</th></tr>
+                                    </thead>
+                                    <tbody id="dashboard-types-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="stat-card card card-full">
+                            <div class="stat-card-title">Endpoints per Agency</div>
+                            <div class="dashboard-table-wrapper">
+                                <table class="dashboard-table">
+                                    <thead>
+                                        <tr><th>Agency</th><th>Count</th></tr>
+                                    </thead>
+                                    <tbody id="dashboard-agencies-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Page: Endpoints -->
+                <section id="page-endpoints" class="content-page">
+                    <div class="page-header">
+                        <div>
+                            <h2>Endpoint Inventory</h2>
+                            <p class="page-subtitle">Track, audit, and provision connected client nodes across Commands.
+                            </p>
+                        </div>
+                        <button id="btn-add-endpoint" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Endpoint
+                        </button>
+                    </div>
+
+                    <!-- Filters Control Bar -->
+                    <div class="control-bar">
+                        <div class="filter-group flex-grow">
+                            <label for="filter-search" class="sr-only">Search</label>
+                            <input type="text" id="filter-search" placeholder="Filter by ID, Owner, or Remarks...">
+                        </div>
+                        <div class="filter-group">
+                            <select id="filter-status">
+                                <option value="ALL">All Statuses</option>
+                                <option value="Serviceable">Serviceable</option>
+                                <option value="Unserviceable">Unserviceable</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="filter-type">
+                                <option value="ALL">All Types</option>
+                                <option value="LAPTOP">LAPTOP</option>
+                                <option value="OC">OC</option>
+                                <option value="OWS">OWS</option>
+                                <option value="RADIO">RADIO</option>
+                                <option value="RIU">RIU</option>
+                                <option value="SCRAMBLE_UNIT">SCRAMBLE_UNIT</option>
+                                <option value="SDR">SDR</option>
+                                <option value="SERVER">SERVER</option>
+                                <option value="TC">TC</option>
+                                <option value="UPS">UPS</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="filter-command">
+                                <option value="ALL">All Commands</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <button id="btn-clear-filters" class="btn btn-secondary" title="Clear Filters">Reset</button>
+                    </div>
+
+                    <!-- Endpoints Data Table Container -->
+                    <div class="table-container card">
+                        <table id="table-endpoints">
+                            <thead>
+                                <tr>
+                                    <th>Endpoint ID</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Owner</th>
+                                    <th>Command</th>
+                                    <th>NTN</th>
+                                    <th>Agency</th>
+                                    <th>Remarks</th>
+                                    <th>IM Raised</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="endpoints-tbody">
+                                <!-- Dynamic rows loaded here -->
+                            </tbody>
+                        </table>
+                        <div id="endpoints-empty-state" class="empty-state hidden">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <h3>No endpoints found</h3>
+                            <p>No records match the current filter selection or database is empty.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Page: Agency Types -->
+                <section id="page-agency-types" class="content-page hidden">
+                    <div class="page-header">
+                        <div>
+                            <h2>Agency Classifications</h2>
+                            <p class="page-subtitle">Configure organization classifications mapped to internal
+                                structures.</p>
+                        </div>
+                        <button id="btn-add-agency-type" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Agency Type
+                        </button>
+                    </div>
+
+                    <!-- Agency Type Table -->
+                    <div class="table-container card max-w-3xl">
+                        <table id="table-agency-types">
+                            <thead>
+                                <tr>
+                                    <th>Type Name</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agency-types-tbody">
+                                <!-- Dynamic rows loaded here -->
+                            </tbody>
+                        </table>
+                        <div id="agency-types-empty-state" class="empty-state hidden">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <h3>No agency types configured</h3>
+                            <p>Create a classification standard to initiate mappings.</p>
+                        </div>
+                    </div>
+                </section>
+                <!-- Page: Agencies-->
+                <section id="page-agencies" class="content-page hidden">
+                    <div class="page-header">
+                        <div>
+                            <h2>Agencies</h2>
+                            <p class="page-subtitle">Manage organization entities and their details.</p>
+                        </div>
+                        <button id="btn-add-agency" class="btn btn-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+
+                            </svg>
+                            Add Agency
+                        </button>
+                    </div>
+                    <!-- Filters Control Bar -->
+                    <div class="control-bar">
+                        <div class="filter-group flex-grow">
+                            <label for="ag-filter-search" class="sr-only">Search</label>
+                            <input type="text" id="ag-filter-search" placeholder="Filter by Agency Name...">
+                        </div>
+
+                        <div class="filter-group">
+                            <select id="ag-filter-command">
+                                <option value="ALL">All Commands</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="ag-filter-ntn">
+                                <option value="ALL">All NTN</option>
+                                <!-- Populated dynamically -->
+                            </select>
+                        </div>
+
+
+                        <button id="ag-btn-clear-filters" class="btn btn-secondary" title="Clear Filters">Reset</button>
+                    </div>
+                    <!-- Agency Table -->
+                    <div class="table-container card max-w-3xl">
+                        <table id="table-agencies">
+                            <thead>
+                                <tr>
+                                    <th>Agency Name</th>
+                                    <th>Command</th>
+                                    <th>NTN</th>
+                                    <th>Agency Type</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="agencies-tbody">
+                                <!-- Dynamic rows loaded here -->
+                            </tbody>
+                        </table>
+                        <div id="agency-empty-state" class="empty-state hidden">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <h3>No agencies configured</h3>
+                            <p>Create an agency to initiate mappings.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Modal: Endpoint Form -->
+        <div id="modal-endpoint" class="modal-backdrop hidden">
+            <div class="modal card">
+                <div class="modal-header">
+                    <h3 id="endpoint-modal-title">Add Endpoint</h3>
+                    <button class="btn-close" aria-label="Close Modal">&times;</button>
+                </div>
+                <form id="form-endpoint">
+                    <input type="hidden" id="form-endpoint-is-edit" value="false">
+
+                    <div class="form-grid">
+                        <div class="form-group col-span-2">
+                            <label for="ep-id">Endpoint ID <span class="required">*</span></label>
+                            <input type="text" id="ep-id" name="endpointId" placeholder="e.g., EP-9042" required>
+                            <span class="field-error" id="ep-id-error"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ep-type">Endpoint Type <span class="required">*</span></label>
+                            <select id="ep-type" name="endpointType" required>
+                                <option value="">Select Type</option>
+                                <option value="LAPTOP">LAPTOP</option>
+                                <option value="OC">OC</option>
+                                <option value="OWS">OWS</option>
+                                <option value="RADIO">RADIO</option>
+                                <option value="RIU">RIU</option>
+                                <option value="SCRAMBLE_UNIT">SCRAMBLE_UNIT</option>
+                                <option value="SDR">SDR</option>
+                                <option value="SERVER">SERVER</option>
+                                <option value="TC">TC</option>
+                                <option value="UPS">UPS</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ep-status">Status <span class="required">*</span></label>
+                            <select id="ep-status" name="status" required>
+                                <option value="Serviceable">Serviceable</option>
+                                <option value="Unserviceable">Unserviceable</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-span-2">
+                            <label for="ep-owner">Owner <span class="required">*</span></label>
+                            <input type="text" id="ep-owner" name="owner" placeholder="e.g., Alice Vance" required>
+                        </div>
+
+                        <!-- Dependent Hierarchical Group -->
+                        <div class="form-group">
+                            <label for="ep-command">Command <span class="required">*</span></label>
+                            <select id="ep-command" name="command" required>
+                                <option value="">Select Command</option>
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ep-ntn">NTN<span class="required">*</span></label>
+                            <select id="ep-ntn" name="ntn" required disabled>
+                                <option value="">Select NTN</option>
+                                <!-- Dynamic dependent -->
+                            </select>
+                        </div>
+
+                        <div class="form-group col-span-2">
+                            <label for="ep-agency">Agency <span class="required">*</span></label>
+                            <select id="ep-agency" name="agencyId" required disabled>
+                                <option value="">Select Agency</option>
+                                <!-- Dynamic dependent -->
+                            </select>
+                        </div>
+
+                        <div class="form-group col-span-2">
+                            <label for="ep-remarks">Remarks</label>
+                            <textarea id="ep-remarks" name="remarks" rows="2"
+                                placeholder="Add administrative system updates or tracking notes..."></textarea>
+                        </div>
+
+                        <div class="form-group col-span-2 checkbox-group">
+                            <select id="ep-im" name="imRaised">
+                                <option value="YES">Yes</option>
+                                <option value="NO">No</option>
+                                <option value="N/A">N/A</option>
+                            </select>
+                            <label for="ep-im">Incident Management Ticket (IM) Raised for this asset</label>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Agency Type Form -->
+        <div id="modal-agency-type" class="modal-backdrop hidden">
+            <div class="modal modal-sm card">
+                <div class="modal-header">
+                    <h3 id="agency-type-modal-title">Add Agency Type</h3>
+                    <button class="btn-close" aria-label="Close Modal">&times;</button>
+                </div>
+                <form id="form-agency-type">
+                    <input type="hidden" id="form-agency-type-is-edit" value="false">
+                    <input type="hidden" id="form-agency-type-id" value="">
+
+                    <div class="form-group">
+                        <label for="at-name">Type Name <span class="required">*</span></label>
+                        <input type="text" id="at-name" name="typeName" placeholder="e.g., Regional Bureau" required>
+                        <span class="field-error" id="at-name-error"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Agency Form -->
+        <div id="modal-agency" class="modal-backdrop hidden">
+            <div class="modal card">
+                <div class="modal-header">
+                    <h3 id="agency-modal-title">Add Agency</h3>
+                    <button class="btn-close" aria-label="Close Modal">&times;</button>
+                </div>
+                <form id="form-agency">
+                    <input type="hidden" id="form-agency-is-edit" value="false">
+                    <input type="hidden" id="form-agency-id" value="">
+
+                    <div class="form-grid">
+
+                        <div class="form-group col-span-2">
+                            <label for="ag-name">Agency Name <span class="required">*</span></label>
+                            <input type="text" id="ag-name" name="agencyName" placeholder="e.g., Agency z" required>
+                            <span class="field-error" id="ag-name-error"></span>
+                        </div>
+
+                        <!-- Dependent Hierarchical Group -->
+                        <div class="form-group col-span-2">
+                            <label for="ag-type">Agency Type <span class="required">*</span></label>
+                            <select id="ag-type" name="agencyTypeId" required>
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+
+                        <!-- Dependent Hierarchical Group -->
+                        <div class="form-group ">
+                            <label for="ag-command">Command<span class="required">*</span></label>
+                            <select id="ag-command" name="command" required>
+                                <option value="">Select Command</option>
+                                <!-- Dynamic -->
+                            </select>
+                        </div>
+
+                        <div class="form-group ">
+                            <label for="ag-ntn">NTN<span class="required">*</span></label>
+                            <select id="ag-ntn" name="ntn" required disabled>
+                                <option value="">Select NTN</option>
+                                <!-- Dynamic dependent -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal: Confirmation Dialogue -->
+        <div id="modal-confirm" class="modal-backdrop hidden">
+            <div class="modal modal-sm card">
+                <div class="modal-header">
+                    <h3>Confirm Action</h3>
+                    <button class="btn-close" aria-label="Close Modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirm-message">Are you sure you want to perform this structural update?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-cancel">Cancel</button>
+                    <button id="btn-confirm-action" class="btn btn-danger">Confirm Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global Toast Container -->
+        <div id="toast-container"></div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>
